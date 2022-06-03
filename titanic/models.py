@@ -6,6 +6,7 @@ from context.models import Model
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestRegressor
 
 class TitanicModel:
     model = Model()
