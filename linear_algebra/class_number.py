@@ -20,7 +20,11 @@ class Cnumber:
             plt.title("image {}".format(i + 1))
         plt.suptitle("숫자 0과 1 이미지")
         plt.tight_layout()
-        plt.show()
+        # plt.show()
+        plt.savefig('test_1.png',
+                    facecolor='#eeeeee',
+                    edgecolor='black',
+                    format='png', dpi=200)
 
     def vector_image(self):
         v = [self.d[i].reshape(64, 1) for i in range(8)]
@@ -35,8 +39,11 @@ class Cnumber:
             plt.title("벡터 {}".format(i + 1))
         plt.suptitle("벡터화된 이미지", y=1.05)
         plt.tight_layout(w_pad=7)
-        plt.show()
-
+        # plt.show()
+        plt.savefig('test_2.png',
+                    facecolor='#eeeeee',
+                    edgecolor='black',
+                    format='png', dpi=200)
 if __name__ == '__main__':
     Cnumber().scan_image()
     Cnumber().vector_image()

@@ -30,6 +30,5 @@ class Raccoon:
         plt.title("Blue 채널")
 
         plt.show()
-
 if __name__ == '__main__':
     Raccoon.solution()
