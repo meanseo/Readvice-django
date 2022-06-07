@@ -44,6 +44,7 @@ class Cnumber:
                     facecolor='#eeeeee',
                     edgecolor='black',
                     format='png', dpi=200)
+
 if __name__ == '__main__':
     Cnumber().scan_image()
     Cnumber().vector_image()
