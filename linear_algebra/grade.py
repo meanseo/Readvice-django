@@ -3,8 +3,10 @@ import matplotlib.pyplot as plt
 
 class Grade:
     def __init__(self):
+        # 1. Training Data Set
         self.x_data = np.array([1, 2, 3, 4, 5, 7, 8, 10, 12, 13, 14, 15, 18, 20, 25, 28, 30]).reshape(-1, 1)
         self.t_data = np.array([5, 7, 20, 31, 40, 44, 46, 49, 60, 62, 70, 80, 85, 91, 92, 97, 98]).reshape(-1, 1)
+        # 2. Linear Regression Model 정의
         self.W = np.random.rand(1, 1)  # matrix
         self.b = np.random.rand(1)  # scalar
         # 6. learning rate 정의
@@ -17,8 +19,8 @@ class Grade:
         y = np.dot(x, self.W) + self.b
         return np.mean(np.power((t - y), 2))  # 최소 제곱법
 
-    # 4. 미분함수
     @staticmethod
+    # 4. 미분함수
     def numerical_derivative(f, x):
         # f : 미분하려고 하는 다변수 함수
         # x : 모든 변수를 포함하고 있는 ndarray
@@ -56,12 +58,11 @@ class Grade:
     def predict(self, x):
         return np.dot(x, self.W) + self.b  # Hypothesis, Linear Regression Model
 
-    def main(self):
-        # 6. learning rate 정의
-        learning_rate = 0.0001
-
-        # 미분을 진행할 loss_func에 대한 lambda 함수를 정의
-        f = lambda x: self.loss_func(self.x_data, self.t_data)
+    def solution(self):
+        x_data = self.x_data
+        t_data = self.t_data
+        f = self.f
+        learning_rate = self.learning_rate
 
         # 7. 학습 진행
         # 반복해서 W와 b를 업데이트하며 학습 진행
@@ -70,15 +71,15 @@ class Grade:
             self.b = self.b - learning_rate * self.numerical_derivative(f, self.b)  # b의 편미분
 
             if step % 9000 == 0:
-                print('W : {}, b : {}, loss : {}'.format(self.W, self.b, self.loss_func(self.x_data, self.t_data)))
+                print('W : {}, b : {}, loss : {}'.format(self.W, self.b, self.loss_func(x_data, t_data)))
 
         # 8. 학습종료 후 예측
         print(self.predict(19))  # [[77.86823633]]
 
         # 데이터의 분포를 scatter로 확인
-        plt.scatter(self.x_data.ravel(), self.t_data.ravel())
-        plt.plot(self.x_data.ravel(), np.dot(self.x_data, self.W) + self.b)  # 직선
+        plt.scatter(x_data.ravel(), t_data.ravel())
+        plt.plot(x_data.ravel(), np.dot(x_data, self.W) + self.b)  # 직선
         plt.show()
 
 if __name__ == '__main__':
-    Grade().main()
+    Grade().solution()
