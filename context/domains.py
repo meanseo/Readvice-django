@@ -58,6 +58,30 @@ class Dataset:
     @label.setter
     def label(self, label): self._label = label
 
+@dataclass
+class File(object):
+    context: str
+    fname: str
+    dframe: object
+
+    @property
+    def context(self) -> str: return self._context
+
+    @context.setter
+    def context(self, context): self._context = context
+
+    @property
+    def fname(self) -> str: return self._fname
+
+    @fname.setter
+    def fname(self, fname): self._fname = fname
+
+    @property
+    def dframe(self) -> str: return self._dframe
+
+    @dframe.setter
+    def dframe(self, dframe): self._dframe = dframe
+
 class PrinterBase(metaclass=ABCMeta):
     @abstractmethod
     def dframe(self):
@@ -100,5 +124,11 @@ class Reader(ReaderBase):
 
 # Printer
 class Printer(PrinterBase):
-    def dframe(self):
-        pass
+    def dframe(self, this):
+        print('*' * 100)
+        print(f'1. Target type \n {type(this)} ')
+        print(f'2. Target column \n {this.columns} ')
+        print(f'3. Target top 1개 행\n {this.head(1)} ')
+        print(f'4. Target bottom 1개 행\n {this.tail(1)} ')
+        print(f'4. Target null 의 갯수\n {this.isnull().sum()}개')
+        print('*' * 100)
