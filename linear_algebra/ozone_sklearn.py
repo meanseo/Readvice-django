@@ -10,7 +10,6 @@ class OzoneSklearn:
 
         # 2. Data Preprocessing
         self.training_data = df[['Temp', 'Ozone']]
-
         self.training_data = self.training_data.dropna(how='any')
 
         # 3. Training Data Set

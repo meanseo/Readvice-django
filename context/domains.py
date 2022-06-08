@@ -2,6 +2,10 @@
 from dataclasses import dataclass
 from abc import *
 
+import googlemaps
+import pandas as pd
+
+
 @dataclass
 class Dataset:
     dname: str
@@ -62,34 +66,37 @@ class PrinterBase(metaclass=ABCMeta):
 # new_file, csv, xls, json
 class ReaderBase(metaclass=ABCMeta):
     @abstractmethod
-    def new_file(self):
+    def new_file(self, file)-> str:
         pass
 
     @abstractmethod
-    def csv(self):
+    def csv(self)-> object:
         pass
 
     @abstractmethod
-    def xls(self):
+    def xls(self)-> object:
         pass
 
     @abstractmethod
-    def json(self):
+    def json(self)-> object:
         pass
 
 # Reader
 class Reader(ReaderBase):
-    def new_file(self):
-        pass
+    def new_file(self, file)-> str:
+        return file.context + file.fname
 
-    def csv(self):
-        pass
+    def csv(self, fname)-> object:
+        return pd.read_csv(f'{self.new_file(fname)}.csv', encoding='utf-8', thousands='')
 
-    def xls(self):
-        pass
+    def xls(self, fname, header, cols)-> object:
+        return pd.read_excel(f'{self.new_file(fname)}.xls', header=header, usecols=cols)
 
-    def json(self):
-        pass
+    def json(self, fname)-> object:
+        return pd.read_json(f'{self.new_file(fname)}.json', encoding='utf-8')
+
+    def gmaps(self)-> object:
+        return googlemaps.Client(key='')
 
 # Printer
 class Printer(PrinterBase):
