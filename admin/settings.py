@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'users.apps.UsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -75,12 +76,12 @@ WSGI_APPLICATION = 'admin.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'readvicedb',
         'USER': 'root',
         'PASSWORD': 'root',
-        'HOST': '127.0.0.1',
-        'PORT': '3306'
+        'HOST': 'localhost',
+        'PORT': '3307'
     }
 }
 

@@ -39,5 +39,5 @@ tqdm
 urllib3==1.25.10
 Werkzeug==1.0.1
 wincertstore==0.2
-pytorch==1.9.0
+pytorch==1.10.2
 torch
