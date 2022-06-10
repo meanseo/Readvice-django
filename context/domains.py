@@ -124,7 +124,8 @@ class Reader(ReaderBase):
 
 # Printer
 class Printer(PrinterBase):
-    def dframe(self, this):
+    @staticmethod
+    def print(this):
         print('*' * 100)
         print(f'1. Target type \n {type(this)} ')
         print(f'2. Target column \n {this.columns} ')
