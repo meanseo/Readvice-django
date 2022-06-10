@@ -113,13 +113,13 @@ class Reader(ReaderBase):
     def csv(self, file)-> object:
         return pd.read_csv(f'{self.new_file(file)}.csv', encoding='utf-8', thousands=',')
 
-    def xls(self, file, header, cols)-> object:
-        return pd.read_excel(f'{self.new_file(file)}.xls', header=header, usecols=cols)
+    def xls(self, file, header, cols, skiprows)-> object:
+        return pd.read_excel(f'{self.new_file(file)}.xls', header=header, usecols=cols, skiprows=skiprows)
 
     def json(self, file)-> object:
         return pd.read_json(f'{self.new_file(file)}.json', encoding='utf-8')
 
-    def gmaps(self)-> object:
+    def gmaps(self):
         return googlemaps.Client(key='')
 
 # Printer
