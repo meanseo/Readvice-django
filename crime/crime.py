@@ -1,3 +1,5 @@
+import pandas as pd
+
 from context.domains import Reader, File
 import folium
 
@@ -25,12 +27,10 @@ class Solution(Reader):
                 break
             if menu == '1':
                 self.save_police_pos()
-                pass
             if menu == '2':
                 self.folium_test()
-                pass
             if menu == '3':
-                pass
+                self.save_cctv_pos()
             elif menu == '0':
                 break
 
@@ -101,19 +101,53 @@ class Solution(Reader):
             temp = name.split()
             gu_name = [gu for gu in temp if gu[-1] == '구'][0]
             gu_names.append(gu_name)
-        print(gu_names)
-
-        crime.to_csv('./save/police_pos')
+        crime['구별'] = gu_names #'구별'이라는 칼럼을 생성
+        print(crime)
+        '''
+        혜화서
+        '''
+        crime.to_csv('./save/police_pos.csv')
 
     def save_cctv_pos(self):
         file = self.file
         self.file.fname = 'cctv_in_seoul'
         cctv = self.csv(file)
         self.file.fname = 'pop_in_seoul'
-        pop = self.xls(file, 1, 'B, D, G, J, N', 2)
+        pop = self.xls(file, 1, 'B, D, G, J, N', [2]) # 헤더 2행 사용, 사용 칼럼은 앞과 같이 사용, 3행 제거
+        # print(cctv)
+        '''
+             기관명    소계  2013년도 이전  2014년  2015년  2016년
+        0    강남구  2780       1292    430    584    932
+        1    강동구   773        379     99    155    377
+        2    강북구   748        369    120    138    204
+        '''
+        # print(pop)
+        '''
+             자치구          합계        한국인     등록외국인   65세이상고령자
+        0     합계  10197604.0  9926968.0  270636.0  1321458.0
+        1    종로구    162820.0   153589.0    9231.0    25425.0
+        2     중구    133240.0   124312.0    8928.0    20764.0
+        '''
+
+        cctv.rename(columns={cctv.columns[0]:'구별'}, inplace=True)
+        pop.rename(columns={'자치구':'구별',
+                            '합계':'인구수',
+                            '등록외국인':'외국인',
+                            '65세이상고령자': '고령자'}, inplace=True)
+        pop.drop(26, inplace=True) # axis=1은 열, default는 0(행)
+        cctv.drop(cctv.columns[2:6], axis=1, inplace=True)
+        # cctv.drop(['2013년도 이전','2014년','2015년','2016년'], axis=1, inplace=True)
+        # pop.dropna() NaN 값이 하나라도 있으면 날리는 메소드 / pop.dropna(how ='all') 전부 NaN이면 날리는 메소드
+        print(cctv)
         print(pop)
 
-        cctv.to_csv('./save/cctv_pos')
+        pop['외국인비율'] = pop['외국인'] / pop['인구수'] * 100
+        pop['고령자비율'] = pop['고령자'] / pop['인구수'] * 100
+        cctv_pop = pd.merge(cctv, pop, on='구별')
+        print(cctv_pop)
+
+        cctv_pop = pd.DataFrame()
+        cctv_pop.to_csv('./save/cctv_pop.csv')
 
     def save_cctv_norm(self):
         pass

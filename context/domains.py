@@ -110,8 +110,8 @@ class Reader(ReaderBase):
     def new_file(self, file)-> str:
         return file.context + file.fname
 
-    def csv(self, file)-> object:
-        return pd.read_csv(f'{self.new_file(file)}.csv', encoding='utf-8', thousands=',')
+    def csv(self, path: str)-> object:
+        return pd.read_csv(f'{self.new_file(path)}.csv', encoding='utf-8', thousands=',')
 
     def xls(self, file, header, cols, skiprows)-> object:
         return pd.read_excel(f'{self.new_file(file)}.xls', header=header, usecols=cols, skiprows=skiprows)
