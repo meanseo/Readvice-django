@@ -122,8 +122,6 @@ class Reader(ReaderBase):
     def gmaps(self):
         return googlemaps.Client(key='')
 
-# Printer
-class Printer(PrinterBase):
     @staticmethod
     def print(this):
         print('*' * 100)

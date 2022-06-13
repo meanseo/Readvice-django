@@ -1,4 +1,4 @@
-from context.domains import Reader, File, Printer
+from context.domains import Reader, File
 import folium
 
 
@@ -6,11 +6,33 @@ class Solution(Reader):
     def __init__(self):
         self.file = File()
         # self.reader = Reader()
-        self.printer = Printer()
         self.crime_rate_columns = ['살인검거율', '강도검거율', '강간검거율', '절도검거율', '폭력검거율']
         self.crime_columns = ['살인', '강도', '강간', '절도', '폭력']
         # self.file_context = './data/'
         self.file.context = './data/'
+
+    def hook(self):
+        def print_menu():
+            print('0. Exit')
+            print('1. crime_in_seoul.csv, 구글맵 API 를 이용해서 서울 시내 경찰서 주소 목록 파일을 작성하시오.')
+            print('2. us-states.json, us_unemployment.csv 를 이용해서 미국 실업률 지도를 작성하시오.')
+            print('3. cctv_in_seoul.csv, pop_in_seoul.csv 를 이용해서 서울시내 경찰서 주소목록파일(cctv_pop.csv)을 작성하시오.')
+            return input('메뉴 선택 \n')
+
+        while 1:
+            menu = print_menu()
+            if menu == '0':
+                break
+            if menu == '1':
+                self.save_police_pos()
+                pass
+            if menu == '2':
+                self.folium_test()
+                pass
+            if menu == '3':
+                pass
+            elif menu == '0':
+                break
 
     def save_police_pos(self):
         self.file.fname = 'crime_in_seoul'
@@ -68,7 +90,20 @@ class Solution(Reader):
                 'plus_code': {'compound_code': 'HX7Q+CV 대한민국 서울특별시',
                 'global_code': '8Q98HX7Q+CV'}, 'types': ['establishment', 'point_of_interest', 'police']}]
 
-            print(f'name {i} = {temp[0].get("formatted_address")}')
+            # print(f'name {i} = {temp[0].get("formatted_address")}')
+            station_addrs.append(temp[0].get('formatted_address'))
+            t_loc = temp[0].get('geometry')
+            station_lats.append(t_loc['location']['lat'])
+            station_lngs.append(t_loc['location']['lng'])
+
+        gu_names = []
+        for name in station_addrs:
+            temp = name.split()
+            gu_name = [gu for gu in temp if gu[-1] == '구'][0]
+            gu_names.append(gu_name)
+        print(gu_names)
+
+        crime.to_csv('./save/police_pos')
 
     def save_cctv_pos(self):
         file = self.file
@@ -77,6 +112,8 @@ class Solution(Reader):
         self.file.fname = 'pop_in_seoul'
         pop = self.xls(file, 1, 'B, D, G, J, N', 2)
         print(pop)
+
+        cctv.to_csv('./save/cctv_pos')
 
     def save_cctv_norm(self):
         pass
@@ -110,7 +147,4 @@ class Solution(Reader):
         print(self.json(self.file))
 
 if __name__ == '__main__':
-    s = Solution()
-    s.folium_test()
-    # s.save_cctv_pos()
-    #s.draw_crime_map()
+    Solution().hook()
