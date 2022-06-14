@@ -133,7 +133,7 @@ class Reader(ReaderBase):
 
     @staticmethod
     def gmaps() -> GooglemapsClient:
-        a = googlemaps.Client(key='')
+        a = googlemaps.Client(key='ad')
         print(type(a))
         return a
 

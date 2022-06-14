@@ -306,6 +306,5 @@ class Solution(Reader):
                                        'global_code': '8Q98HX7Q+CV'},
                          'types': ['establishment', 'point_of_interest', 'police']}]
 
-
 if __name__ == '__main__':
     Solution().hook()
