@@ -125,6 +125,10 @@ class Reader(ReaderBase):
     def xls(self, path: str, header: str, cols: str, skiprows)-> PandasDataFrame:
         return pd.read_excel(f'{self.new_file(path)}.xls', header=header, usecols=cols, skiprows=skiprows)
 
+    def xlsx(self, path: str)-> PandasDataFrame:
+        return pd.read_excel(f'{self.new_file(path)}.xlsx')
+
+
     def json(self, path: str)-> PandasDataFrame:
         return pd.read_json(f'{self.new_file(path)}.json', encoding='UTF-8')
 
@@ -133,7 +137,7 @@ class Reader(ReaderBase):
 
     @staticmethod
     def gmaps() -> GooglemapsClient:
-        a = googlemaps.Client(key='ad')
+        a = googlemaps.Client(key='')
         print(type(a))
         return a
 
