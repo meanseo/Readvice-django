@@ -1,10 +1,7 @@
-import matplotlib
 import pandas as pd
 import numpy as np
-
 import platform
 import matplotlib.pyplot as plt
-from matplotlib import font_manager, rc
 from selenium import webdriver
 import time
 import re
@@ -13,11 +10,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 from selenium.common.exceptions import WebDriverException
-
+from matplotlib import rc, font_manager
 
 from context.domains import Reader, File
-
-from matplotlib import rc, font_manager
 
 from context.models import Model
 
@@ -25,9 +20,8 @@ from context.models import Model
 class Solution(Reader):
     def __init__(self):
         rc('font', family=font_manager.FontProperties(fname='C:/Windows/Fonts/malgunsl.ttf').get_name())
-
         self.file = File()
-        # self.driver = webdriver.Chrome("C:/Users/minseo/Downloads/chromedriver_win32/chromedriver.exe") # chromedriver 설치 후 경로 복사, \ -> / 로 변경
+        self.driver = webdriver.Chrome("C:/Users/minseo/Downloads/chromedriver_win32/chromedriver.exe") # chromedriver 설치 후 경로 복사, \ -> / 로 변경
         self.file.context = './data/'
 
     def hook(self):
@@ -51,6 +45,8 @@ class Solution(Reader):
     def get_data(self):
         driver = self.driver
         try:
+            driver.get(
+                "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=VC&secondMenuId=VCCP09")
             driver.get(
                 "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=VC&secondMenuId=VCCP09")
         except WebDriverException:

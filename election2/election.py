@@ -7,13 +7,7 @@ class Solution(Reader):
         self.file.context = './data/'
 
     def new_df(self):
-        self.file.fname = 'total_election.xlsx'
-        election_result_raw = self.xlsx(self.file)
-        election_result_raw = {'광역시도': [],
-                               '시군': [],
-                               'pop': [],
-                               'moon': [],
-                               'hong': [],
-                               'ahn': []}
+        pass
+
 if __name__ == '__main__':
     pass
