@@ -1,13 +1,22 @@
+import numpy as np
 from bs4 import BeautifulSoup
 import urllib.request
 import pandas as pd
 import icecream as ic
+import math
 
 from context.domains import Reader, File
+from matplotlib import pyplot as plt
+from scipy import misc
+from matplotlib import rc, font_manager
+rc('font', family=font_manager.FontProperties(fname='C:/Windows/Fonts/malgunsl.ttf').get_name())
+import matplotlib
+matplotlib.rcParams['axes.unicode_minus'] = False
 
 '''
 출처: https://prlabhotelshoe.tistory.com/20?category=1003351
 '''
+# ML 구조
 class Solution(Reader):
     def __init__(self):
         self.movie_comment = pd.DataFrame()
@@ -17,8 +26,8 @@ class Solution(Reader):
     def hook(self):
         def print_menu():
             print('0. Exit')
-            print('1. driver를 이용한 크롤링 후 코멘트 파일 생성.')
-            print('2. 정형화 ')
+            print('1. 전처리: 데이터 마이닝(크롤링)')
+            print('2. 전처리: 정형화 ')
             print('3. 토큰화 ')
             print('3. 임베딩 ')
             return input('메뉴 선택 \n')
@@ -36,20 +45,21 @@ class Solution(Reader):
 
     def preprocess(self):
         self.stereotype()
-        ic(self.movie_comments.head(5))
-        ic(self.movie_comments)
-
-    def tokenization(self):
-        pass
-
-    def embedding(self):
-        pass
+        df = self.movie_comments
+        # ic(df.head())
+        df = df.dropna()
+        df = df.drop_duplicates(['comment'])
+        # self.reviews_info(df)
+        df.label.value_counts()
+        top10 = self.top10_movies(df)
+        avg_score = self.get_avg_score(top10)
+        self.visualization(avg_score, top10)
 
     def crawling(self):
         file = self.file
         file.fname = 'movie_reviews.txt'
         path = file
-        f = open('./data/movie_reviews.txt', 'w', encoding='UTF-8')
+        f = open('save/movie_reviews.txt', 'w', encoding='UTF-8')
         # -- 500페이지까지 크롤링
         for no in range(1, 501):
             url = 'https://movie.naver.com/movie/point/af/list.naver?&page=%d' % no
@@ -75,97 +85,91 @@ class Solution(Reader):
 
     def stereotype(self):
         file = self.file
+        file.context = './save/'
         file.fname = 'movie_reviews.txt'
         path = self.new_file(file)
         self.movie_comments = pd.read_csv(path, delimiter='\t',
                                           names=['title', 'score', 'comment', 'label'])
-        '''
-                                     title  ...  label
-        0                       그대가 조국  ...      0
-        1                 쥬라기 월드: 도미니언  ...      1
-        2  마녀(魔女) Part2. The Other One  ...      1
-        3                      두 번째 스물  ...      1
-        4  마녀(魔女) Part2. The Other One  ...      0
-        5             부에노스 아이레스 제로 디그리  ...      1
-        6                        범죄도시2  ...      1
-        7  마녀(魔女) Part2. The Other One  ...      1
-        8                     버즈 라이트이어  ...      1
-        9  마녀(魔女) Part2. The Other One  ...      1
-        '''
         # 리턴 안하고 전역으로 뺌
 
-    def remove_data(self):
-        df_data = self.stereotype()
-        # df_data.info()
-        '''
-                <class 'pandas.core.frame.DataFrame'>
-        RangeIndex: 5000 entries, 0 to 4999
-        Data columns (total 4 columns):
-         #   Column   Non-Null Count  Dtype 
-        ---  ------   --------------  ----- 
-         0   title    5000 non-null   object
-         1   score    5000 non-null   int64 
-         2   comment  4684 non-null   object
-         3   label    5000 non-null   int64 
-        dtypes: int64(2), object(2)
-        memory usage: 156.4+ KB
-        '''
-        # 전체 리뷰 수 확인, 전체리뷰와 평점은 5000, 하지만 코멘트는 4684
-        # 코멘트가 없는 리뷰 데이터(NaN) 제거
-        df_reviews = df_data.dropna()
-        # 중복 리뷰 제거
-        df_reviews = df_reviews.drop_duplicates(['comment'])
+    def reviews_info(self, df):
+        movie_lst = df.title.unique()
+        ic('전체 영화 편수 =', len(movie_lst))
+        ic(movie_lst[:10])
+        cnt_movie = df.title.value_counts()
+        ic(cnt_movie[:20])
+        info_movie = df.groupby('title')['score'].describe()
+        ic(info_movie.sort_values(by=['count'], axis=0, ascending=False))
 
-        df_reviews.info()
-        '''
-                [10 rows x 4 columns]
-        <class 'pandas.core.frame.DataFrame'>
-        Int64Index: 4649 entries, 0 to 4999
-        Data columns (total 4 columns):
-         #   Column   Non-Null Count  Dtype 
-        ---  ------   --------------  ----- 
-         0   title    4649 non-null   object
-         1   score    4649 non-null   int64 
-         2   comment  4649 non-null   object
-         3   label    4649 non-null   int64 
-        dtypes: int64(2), object(2)
-        memory usage: 181.6+ KB
-        '''
-        # 코멘트 없는 리뷰와 중복 리뷰 제거 후 총 리뷰 4649로 축소
-        # df_reviews.head(10)
-        return df_reviews
+    def top10_movies(self, df):
+        top10 = df.title.value_counts().sort_values(ascending=False)[:10]
+        top10_title = top10.index.tolist()
+        return df[df['title'].isin(top10_title)]
 
-    def comment_count(self):
-        df_reviews = self.remove_data()
-        movie_lst = df_reviews.title.unique()
-        print('전체 영화 편수 =', len(movie_lst))
-        print(movie_lst[:10])
-        '''
-        전체 영화 편수 = 803
-        ['그대가 조국' '쥬라기 월드: 도미니언' '마녀(魔女) Part2. The Other One' '두 번째 스물'
-         '부에노스 아이레스 제로 디그리' '범죄도시2' '버즈 라이트이어' '실종' '다크 나이트 라이즈' '라스베가스를 떠나며']
-        '''
-        # 각 영화 리뷰 수 계산
-        cnt_movie = df_reviews.title.value_counts()
-        print(cnt_movie[:10])
-        '''
-        브로커                               1326
-        범죄도시2                              684
-        마녀(魔女) Part2. The Other One        500
-        쥬라기 월드: 도미니언                       265
-        그대가 조국                             151
-        버즈 라이트이어                            90
-        인터셉터                                64
-        닥터 스트레인지: 대혼돈의 멀티버스                 50
-        피는 물보다 진하다                          44
-        애프터 양                               38
-        '''
-        info_movie = df_reviews.groupby('title')['score'].describe()
-        print(info_movie.sort_values(by=['count'], axis=0, ascending=False))
-        print(df_reviews.label.value_counts())
+    def get_avg_score(self, top10):
+        movie_title = top10.title.unique().tolist()  # -- 영화 제목 추출
+        avg_score = {}  # -- {제목 : 평균} 저장
+        for t in movie_title:
+            avg = top10[top10['title'] == t]['score'].mean()
+            avg_score[t] = avg
+        return avg_score
 
+    def visualization(self, avg_score, top10):
+        plt.figure(figsize=(10, 5))
+        plt.title('영화 평균 평점 (top 10: 리뷰 수)\n', fontsize=17)
+        plt.xlabel('영화 제목')
+        plt.ylabel('평균 평점')
+        plt.xticks(rotation=20)
 
+        for x, y in avg_score.items():
+            color = np.array_str(np.where(y == max(avg_score.values()), 'orange', 'lightgrey'))
+            plt.bar(x, y, color=color)
+            plt.text(x, y, '%.2f' % y,
+                     horizontalalignment='center',
+                     verticalalignment='bottom')
+
+        plt.show()
+        self.rating_distribution(avg_score, top10)
+        self.circle(avg_score, top10)
+
+    def rating_distribution(self, avg_score, top10):
+        fig, axs = plt.subplots(5, 2, figsize=(15, 25))
+        axs = axs.flatten()
+
+        for title, avg, ax in zip(avg_score.keys(), avg_score.values(), axs):
+            num_reviews = len(top10[top10['title'] == title])
+            x = np.arange(num_reviews)
+            y = top10[top10['title'] == title]['score']
+            ax.set_title('\n%s (%d명)' % (title, num_reviews), fontsize=15)
+            ax.set_ylim(0, 10.5, 2)
+            ax.plot(x, y, 'o')
+            ax.axhline(avg, color='red', linestyle='--')  # -- 평균 점선 나타내기
+
+        plt.show()
+
+    def circle(self, avg_score, top10):
+        fig, axs = plt.subplots(5, 2, figsize=(15, 25))
+        axs = axs.flatten()
+        colors = ['pink', 'gold', 'whitesmoke']
+        labels = ['1 (8~10점)', '0 (1~4점)', '2 (5~7점)']
+
+        for title, ax in zip(avg_score.keys(), axs):
+            num_reviews = len(top10[top10['title'] == title])
+            values = top10[top10['title'] == title]['label'].value_counts()
+            ax.set_title('\n%s (%d명)' % (title, num_reviews), fontsize=15)
+            ax.pie(values,
+                   autopct='%1.1f%%',
+                   colors=colors,
+                   shadow=True,
+                   startangle=90)
+            ax.axis('equal')
+        plt.show()
+
+    def tokenization(self):
+        pass
+
+    def embedding(self):
+        pass
 
 if __name__ == '__main__':
-    Solution().comment_count()
     Solution().hook()
