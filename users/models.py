@@ -2,10 +2,9 @@ from django.db import models
 
 class User(models.Model):
     use_in_migrations = True
-    username = models.CharField(primary_key=True, max_length=10)
+    email = models.TextField(primary_key=True)
     password = models.CharField(max_length=10)
-    name = models.TextField()
-    email = models.TextField()
+    username = models.TextField()
     birth = models.TextField()
     gender = models.TextField()
 
@@ -13,4 +12,4 @@ class User(models.Model):
         db_table = "users"
 
     def __str__(self):
-        return f'{self.pk} {self.username}'
+        return f'{self.pk} {self.email}'

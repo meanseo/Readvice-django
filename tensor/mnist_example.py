@@ -1,5 +1,5 @@
 import tensorflow as tf
-import icecream as ic
+from icecream import ic
 
 class Solution(object):
     def __init__(self):
@@ -55,4 +55,5 @@ class Solution(object):
         pass
 
 if __name__ == '__main__':
+    ic(tf.__version__)
     Solution().hook()
