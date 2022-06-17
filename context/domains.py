@@ -132,9 +132,6 @@ class Reader(ReaderBase):
     def json(self, path: str)-> PandasDataFrame:
         return pd.read_json(f'{self.new_file(path)}.json', encoding='UTF-8')
 
-    def txt(self, path: str) ->PandasDataFrame:
-        return pd.read_
-
     def map_json(self, path: str) -> object:
         return json.load(open(f'{self.new_file(path)}.json', encoding='UTF-8'))
 
