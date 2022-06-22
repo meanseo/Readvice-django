@@ -260,4 +260,6 @@ class Solution(Reader):
         pass
 
 if __name__ == '__main__':
-    Solution().hook()
+    Solution(
+
+    ).hook()

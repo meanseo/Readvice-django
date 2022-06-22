@@ -137,6 +137,7 @@ class Solution(Reader):
         3           3  서울특별시  성동구  203175.0  ...  서울특별시 성동  42.665682  19.966039  22.480128
         4           4  서울특별시  광진구  240030.0  ...  서울특별시 광진  43.957839  19.317585  22.007249
         '''
+        return election_result
 
     def cut_char_sigu(self, name):
         return name if len(name) == 2 else name[:-1]
