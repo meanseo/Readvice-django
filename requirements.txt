@@ -41,3 +41,5 @@ Werkzeug==1.0.1
 wincertstore==0.2
 pytorch==1.10.2
 torch
+mysqlclient
+djangorestframework
